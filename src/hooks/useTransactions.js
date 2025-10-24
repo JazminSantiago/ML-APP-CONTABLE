@@ -5,9 +5,10 @@ export const useTransactions = () => {
   const [transactions, setTransactions] = useLocalStorage('transactions', []);
   const [adjustments, setAdjustments] = useLocalStorage('adjustments', []);
   const [endDate, setEndDate] = useLocalStorage('endDate', new Date().toISOString().split('T')[0]);
+  const [startDate, setStartDate] = useLocalStorage('startDate', new Date().toISOString().split('T')[0]); // ← AQUÍ quedó insertada
   const [cashCount, setCashCount] = useLocalStorage('cashCount', initialCashCount);
   const [arqueoDate, setArqueoDate] = useLocalStorage('arqueoDate', new Date().toISOString().split('T')[0]);
-
+  
   const addTransaction = (transactionData) => {
     const newTx = {
       id: Date.now(),
@@ -55,6 +56,8 @@ export const useTransactions = () => {
   return {
     transactions,
     adjustments,
+    startDate,
+    setStartDate,
     endDate,
     setEndDate,
     cashCount,
