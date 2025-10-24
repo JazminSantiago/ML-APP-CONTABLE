@@ -1,14 +1,24 @@
 import React from 'react';
 
-export default function MayorGeneral({ ledger, endDate }) {
+export default function MayorGeneral({ 
+  ledger, 
+  endDate,
+  onEndDateChange 
+}) {
   return (
     <div className="space-y-6">
       <div className="text-center mb-8 border-b-2 border-blue-600 pb-4">
         <h2 className="text-xl font-bold text-gray-800">Bite Club S.A.</h2>
-        <p className="text-lg font-semibold text-blue-600 mt-2">MAYOR GENERAL</p>
-        <p className="text-sm text-gray-700 mt-1">
-          Del 1° al {new Date(endDate).toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' })}
-        </p>
+        <p className="text-lg font-semibold text-blue-600 mt-2">LIBRO MAYOR</p>
+        <div className="flex justify-center items-center gap-4 mt-4">
+          <label className="font-semibold text-gray-800">Al:</label>
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => onEndDateChange(e.target.value)}
+            className="p-2 border rounded"
+          />
+        </div>
       </div>
       <div className="space-y-8">
         {Object.entries(ledger).map(([accountName, entries]) => {

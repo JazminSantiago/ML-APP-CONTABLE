@@ -7,7 +7,7 @@ export default function TabNavigation({ activeTab, onTabChange }) {
     { id: 'adjustments', label: 'Ajustes', icon: ClipboardList },
     { id: 'arqueo', label: 'Arqueo de Caja', icon: DollarSign },
     { id: 'journal', label: 'Libro Diario', icon: Book },
-    { id: 'ledger', label: 'Mayor General', icon: Calculator },
+    { id: 'ledger', label: 'Libro Mayor', icon: Calculator },
     { id: 'statements', label: 'Estados Financieros', icon: BarChart3 }
   ];
 
