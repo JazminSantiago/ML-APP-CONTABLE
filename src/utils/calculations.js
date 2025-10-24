@@ -18,7 +18,7 @@ export const calculateCashTotal = (cashCount) => {
   );
 };
 
-// Aplica ajustes contables según el tipo
+// Aplica ajustes contables según el tipo - VERSIÓN CORREGIDA
 const applyAdjustment = (adjustmentType, amount, balances) => {
   const adjustmentMap = {
     'depreciation-edificio': [
@@ -58,7 +58,8 @@ const applyAdjustment = (adjustmentType, amount, balances) => {
   const entries = adjustmentMap[adjustmentType] || [];
   entries.forEach(entry => {
     if (!balances[entry.account]) balances[entry.account] = 0;
-    balances[entry.account] += entry.type === 'debit' ? entry.amount : -entry.amount;
+    
+    const accountType = accountTypes[entry.account];
   });
 };
 
@@ -187,7 +188,7 @@ export function categorizeBalances(balances) {
     } else if (type === 'liability') {
       // Pasivos: los créditos aumentan, débitos disminuyen
       // Si el balance es negativo, el pasivo aumentó (créditos > débitos)
-      liabilities[account] = Math.abs(balance);
+      liabilities[account] = balance;
     } else if (type === 'equity') {
       // Capital: igual que pasivos (créditos aumentan, débitos disminuyen)
       equity[account] = Math.abs(balance);

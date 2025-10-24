@@ -5,6 +5,7 @@ export const accountTypes = {
   'Clientes': 'asset',
   'Inventario': 'asset',
   'IVA Acreditado': 'asset',
+  'IVA por Acreditar': 'asset',
   'Papelería y Útiles': 'asset',
   'Rentas Pagadas por Anticipado': 'asset',
   
@@ -34,6 +35,7 @@ export const accountTypes = {
   'Anticipo de Clientes': 'liability',
   'ISR por Pagar': 'liability',
   'PTU por Pagar': 'liability',
+  'Anticipo de Clientes': 'liability',
   
   // CAPITAL
   'Capital Social': 'equity',
