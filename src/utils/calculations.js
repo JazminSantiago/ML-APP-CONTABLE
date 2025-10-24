@@ -177,16 +177,26 @@ export function categorizeBalances(balances) {
   Object.entries(balances).forEach(([account, balance]) => {
     const type = accountTypes[account];
     
-    if (type === 'asset' || type === 'contra-asset') {
-      assets[account] = balance; // Débitos positivos, créditos negativos
+    if (type === 'asset') {
+      // Activos normales: los débitos aumentan (positivos), créditos disminuyen (negativos)
+      assets[account] = balance;
+    } else if (type === 'contra-asset') {
+      // Depreciaciones acumuladas: créditos aumentan (se muestran como negativos para restar)
+      // Pero en el balance se muestran como valores negativos que se restan del activo
+      assets[account] = balance;
     } else if (type === 'liability') {
-      liabilities[account] = balance; // Débitos negativos, créditos positivos
+      // Pasivos: los créditos aumentan, débitos disminuyen
+      // Si el balance es negativo, el pasivo aumentó (créditos > débitos)
+      liabilities[account] = Math.abs(balance);
     } else if (type === 'equity') {
-      equity[account] = balance; // Débitos negativos, créditos positivos  
+      // Capital: igual que pasivos (créditos aumentan, débitos disminuyen)
+      equity[account] = Math.abs(balance);
     } else if (type === 'revenue') {
-      revenues[account] = balance; // Débitos negativos, créditos positivos
+      // Ingresos: créditos aumentan (negativos en nuestro sistema)
+      revenues[account] = Math.abs(balance);
     } else if (type === 'expense') {
-      expenses[account] = balance; // Débitos positivos, créditos negativos
+      // Gastos: débitos aumentan (positivos)
+      expenses[account] = Math.abs(balance);
     }
   });
 
