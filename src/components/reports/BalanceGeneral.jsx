@@ -1,3 +1,6 @@
+import React from 'react';
+import { accountTypes } from '../../utils/accountTypes';
+
 export default function BalanceGeneral({ 
   assets, 
   liabilities, 
@@ -8,7 +11,7 @@ export default function BalanceGeneral({
   utilidadNeta,
   endDate,
   onEndDateChange,
-  isrCalculado,  // Agregar estos props
+  isrCalculado,
   ptuCalculado
 }) {
   const totalCapitalConUtilidad = totalEquity + utilidadNeta;
