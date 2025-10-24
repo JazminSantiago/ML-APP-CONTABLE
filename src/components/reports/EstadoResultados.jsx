@@ -1,4 +1,3 @@
-// src/components/reports/EstadoResultados.jsx
 import React from 'react';
 
 export default function EstadoResultados({ 
@@ -8,7 +7,9 @@ export default function EstadoResultados({
   isrCalculado,
   ptuCalculado,
   utilidadNeta,
+  startDate, // Nuevo prop para fecha inicial
   endDate,
+  onStartDateChange, // Nuevo prop para manejar cambio de fecha inicial
   onEndDateChange
 }) {
   const costoVentas = Math.abs(balances['Costo de Ventas'] || 0);
@@ -26,7 +27,14 @@ export default function EstadoResultados({
         <h2 className="text-xl font-bold text-gray-800">Bite Club S.A.</h2>
         <p className="text-lg font-semibold text-green-600 mt-2">ESTADO DE RESULTADOS</p>
         <div className="flex justify-center items-center gap-4 mt-4">
-          <label className="font-semibold text-gray-800">Del 1° al:</label>
+          <label className="font-semibold text-gray-800">Del:</label>
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => onStartDateChange(e.target.value)}
+            className="p-2 border rounded"
+          />
+          <label className="font-semibold text-gray-800">al:</label>
           <input
             type="date"
             value={endDate}

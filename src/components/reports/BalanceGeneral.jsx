@@ -8,7 +8,9 @@ export default function BalanceGeneral({
   totalLiabilities, 
   totalEquity, 
   utilidadNeta,
+  startDate, // Nuevo prop para fecha inicial
   endDate,
+  onStartDateChange, // Nuevo prop para manejar cambio de fecha inicial
   onEndDateChange 
 }) {
   const totalCapitalConUtilidad = totalEquity + utilidadNeta;
@@ -21,7 +23,14 @@ export default function BalanceGeneral({
         <h2 className="text-xl font-bold text-gray-800">Bite Club S.A.</h2>
         <p className="text-lg font-semibold text-indigo-600 mt-2">BALANCE GENERAL</p>
         <div className="flex justify-center items-center gap-4 mt-4">
-          <label className="font-semibold text-gray-800">Al:</label>
+          <label className="font-semibold text-gray-800">Del:</label>
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => onStartDateChange(e.target.value)}
+            className="p-2 border rounded"
+          />
+          <label className="font-semibold text-gray-800">al:</label>
           <input
             type="date"
             value={endDate}

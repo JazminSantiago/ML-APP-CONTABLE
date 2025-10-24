@@ -32,6 +32,8 @@ function AccountingApp() {
     updateCashCount,
     arqueoDate,
     setArqueoDate,
+    startDate,
+    setStartDate,
     endDate,
     setEndDate,
     clearAllData,
@@ -55,7 +57,6 @@ function AccountingApp() {
   const [showRegister, setShowRegister] = useState(false);
   const [activeTab, setActiveTab] = useState('transactions');
 
-  // Pantalla de Login/Registro
   if (!isLoggedIn) {
     return showRegister ? (
       <RegisterForm 
@@ -70,7 +71,6 @@ function AccountingApp() {
     );
   }
 
-  // Pantalla principal del sistema
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
       <div className="max-w-7xl mx-auto">
@@ -87,7 +87,6 @@ function AccountingApp() {
           />
 
           <div className="p-8">
-            {/* TRANSACCIONES */}
             {activeTab === 'transactions' && (
               <div className="space-y-6">
                 <TransactionForm onAddTransaction={addTransaction} />
@@ -98,7 +97,6 @@ function AccountingApp() {
               </div>
             )}
 
-            {/* AJUSTES */}
             {activeTab === 'adjustments' && (
               <div className="space-y-6">
                 <AdjustmentForm onAddAdjustment={addAdjustment} />
@@ -109,7 +107,6 @@ function AccountingApp() {
               </div>
             )}
 
-            {/* ARQUEO DE CAJA */}
             {activeTab === 'arqueo' && (
               <ArqueoCaja 
                 cashCount={cashCount}
@@ -120,29 +117,28 @@ function AccountingApp() {
               />
             )}
 
-            {/* LIBRO DIARIO */}
             {activeTab === 'journal' && (
-              <LibroDiario entries={journalEntries} endDate={endDate} />
+              <LibroDiario 
+                entries={journalEntries}
+                startDate={startDate}
+                endDate={endDate}
+                onStartDateChange={setStartDate}
+                onEndDateChange={setEndDate}
+              />
             )}
 
-            {/* MAYOR */}
             {activeTab === 'ledger' && (
-              <MayorGeneral ledger={ledger} endDate={endDate} />
+              <MayorGeneral 
+                ledger={ledger}
+                startDate={startDate}
+                endDate={endDate}
+                onStartDateChange={setStartDate}
+                onEndDateChange={setEndDate}
+              />
             )}
 
-            {/* ESTADOS FINANCIEROS */}
             {activeTab === 'statements' && (
               <div className="space-y-8">
-                <div className="bg-blue-50 p-4 rounded-lg flex gap-4 items-center">
-                  <label className="font-semibold text-gray-800">Fecha de cierre:</label>
-                  <input 
-                    type="date" 
-                    value={endDate} 
-                    onChange={(e) => setEndDate(e.target.value)} 
-                    className="p-2 border rounded" 
-                  />
-                </div>
-
                 <BalanceGeneral 
                   assets={assets}
                   liabilities={liabilities}
@@ -151,7 +147,9 @@ function AccountingApp() {
                   totalLiabilities={totalLiabilities}
                   totalEquity={totalEquity}
                   utilidadNeta={utilidadNetaCalculada}
+                  startDate={startDate}
                   endDate={endDate}
+                  onStartDateChange={setStartDate}
                   onEndDateChange={setEndDate}
                 />
 
@@ -162,7 +160,9 @@ function AccountingApp() {
                   isrCalculado={isrCalculado}
                   ptuCalculado={ptuCalculado}
                   utilidadNeta={utilidadNetaCalculada}
+                  startDate={startDate}
                   endDate={endDate}
+                  onStartDateChange={setStartDate}
                   onEndDateChange={setEndDate}
                 />
               </div>
@@ -174,12 +174,10 @@ function AccountingApp() {
   );
 }
 
-function App() {
+export default function App() {
   return (
     <AccountingProvider>
       <AccountingApp />
     </AccountingProvider>
   );
 }
-
-export default App;
