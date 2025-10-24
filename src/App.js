@@ -174,10 +174,12 @@ function AccountingApp() {
   );
 }
 
-export default function App() {
+function App() {
   return (
     <AccountingProvider>
       <AccountingApp />
     </AccountingProvider>
   );
 }
+
+export default App;
