@@ -14,7 +14,7 @@ export const calculateCashTotal = (cashCount) => {
     cashCount.coin5 * 5 +
     cashCount.coin2 * 2 +
     cashCount.coin1 * 1 +
-    cashCount.coin50c * 0.5
+    cashCount.coin50 * 0.5
   );
 };
 
