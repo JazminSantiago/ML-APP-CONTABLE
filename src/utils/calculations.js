@@ -62,13 +62,23 @@ const applyAdjustment = (adjustmentType, amount, balances) => {
   });
 };
 
-// Calcula saldos de todas las cuentas
+// Calcula saldos de todas las cuentas - VERSIÓN CORREGIDA
 export function getBalance(transactions, adjustments) {
   const balances = {};
   
   transactions.forEach(tx => {
     if (!balances[tx.account]) balances[tx.account] = 0;
-    balances[tx.account] += tx.type === 'debit' ? tx.amount : -tx.amount;
+    
+    const accountType = accountTypes[tx.account];
+    
+    // ✅ TRATAMIENTO DIFERENCIADO POR TIPO DE CUENTA
+    if (accountType === 'asset' || accountType === 'expense') {
+      // Activos y Gastos: débitos aumentan (+), créditos disminuyen (-)
+      balances[tx.account] += tx.type === 'debit' ? tx.amount : -tx.amount;
+    } else {
+      // Pasivos, Capital e Ingresos: créditos aumentan (+), débitos disminuyen (-)
+      balances[tx.account] += tx.type === 'credit' ? tx.amount : -tx.amount;
+    }
   });
 
   adjustments.forEach(adj => {
@@ -167,22 +177,16 @@ export function categorizeBalances(balances) {
   Object.entries(balances).forEach(([account, balance]) => {
     const type = accountTypes[account];
     
-    if (type === 'asset') {
-      // Activos normales son positivos
-      assets[account] = balance;
-    } else if (type === 'contra-asset') {
-      // Depreciaciones acumuladas se restan (se mantienen como están en el balance)
-      assets[account] = balance;
+    if (type === 'asset' || type === 'contra-asset') {
+      assets[account] = balance; // Débitos positivos, créditos negativos
     } else if (type === 'liability') {
-      // Pasivos: invertir el signo (porque en contabilidad los créditos son positivos para pasivos)
-      liabilities[account] = Math.abs(balance);
+      liabilities[account] = balance; // Débitos negativos, créditos positivos
     } else if (type === 'equity') {
-      // Capital: igual que pasivos
-      equity[account] = Math.abs(balance);
+      equity[account] = balance; // Débitos negativos, créditos positivos  
     } else if (type === 'revenue') {
-      revenues[account] = balance;
+      revenues[account] = balance; // Débitos negativos, créditos positivos
     } else if (type === 'expense') {
-      expenses[account] = balance;
+      expenses[account] = balance; // Débitos positivos, créditos negativos
     }
   });
 
