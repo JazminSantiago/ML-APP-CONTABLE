@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function BalanceGeneral({ 
   assets, 
   liabilities, 
@@ -9,7 +7,9 @@ export default function BalanceGeneral({
   totalEquity, 
   utilidadNeta,
   endDate,
-  onEndDateChange 
+  onEndDateChange,
+  isrCalculado,  // Agregar estos props
+  ptuCalculado
 }) {
   const totalCapitalConUtilidad = totalEquity + utilidadNeta;
   const totalPasivoCapital = totalLiabilities + totalCapitalConUtilidad;
@@ -36,12 +36,18 @@ export default function BalanceGeneral({
         <div>
           <h3 className="text-xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2 mb-4">ACTIVOS</h3>
           <div className="space-y-2 mb-4">
-            {Object.entries(assets).map(([account, balance]) => (
-              <div key={account} className="flex justify-between px-4 py-2">
-                <span className="text-gray-700">{account}</span>
-                <span className="font-semibold text-gray-900">${balance.toFixed(2)}</span>
-              </div>
-            ))}
+            {Object.entries(assets).map(([account, balance]) => {
+              const type = accountTypes[account];
+              const displayBalance = type === 'contra-asset' ? -Math.abs(balance) : balance;
+              return (
+                <div key={account} className="flex justify-between px-4 py-2">
+                  <span className="text-gray-700">{account}</span>
+                  <span className={`font-semibold ${displayBalance < 0 ? 'text-red-600' : 'text-gray-900'}`}>
+                    ${displayBalance.toFixed(2)}
+                  </span>
+                </div>
+              );
+            })}
           </div>
           <div className="flex justify-between px-4 py-3 bg-indigo-200 font-bold text-lg rounded">
             <span>Total Activos</span>
@@ -61,10 +67,23 @@ export default function BalanceGeneral({
                   <span className="font-semibold text-gray-900">${balance.toFixed(2)}</span>
                 </div>
               ))}
+              {/* Agregar ISR y PTU como pasivos */}
+              {isrCalculado > 0 && (
+                <div className="flex justify-between px-4 py-2">
+                  <span className="text-gray-700">ISR por Pagar</span>
+                  <span className="font-semibold text-gray-900">${isrCalculado.toFixed(2)}</span>
+                </div>
+              )}
+              {ptuCalculado > 0 && (
+                <div className="flex justify-between px-4 py-2">
+                  <span className="text-gray-700">PTU por Pagar</span>
+                  <span className="font-semibold text-gray-900">${ptuCalculado.toFixed(2)}</span>
+                </div>
+              )}
             </div>
             <div className="flex justify-between px-4 py-2 bg-orange-100 font-semibold rounded">
               <span>Total Pasivos</span>
-              <span>${totalLiabilities.toFixed(2)}</span>
+              <span>${(totalLiabilities + isrCalculado + ptuCalculado).toFixed(2)}</span>
             </div>
           </div>
 
@@ -94,12 +113,12 @@ export default function BalanceGeneral({
       {/* VERIFICACIÓN */}
       <div className="mt-4 p-3 bg-blue-100 rounded text-sm text-gray-700">
         <p className="font-semibold">Verificación: Activos = Pasivos + Capital Social</p>
-        <p>${totalAssets.toFixed(2)} = ${totalPasivoCapital.toFixed(2)}</p>
+        <p>${totalAssets.toFixed(2)} = ${(totalLiabilities + isrCalculado + ptuCalculado + totalCapitalConUtilidad).toFixed(2)}</p>
         {isBalanced ? (
           <p className="text-green-700 font-bold mt-2">✅ La ecuación contable está balanceada</p>
         ) : (
           <p className="text-red-700 font-bold mt-2">
-            ⚠️ Diferencia: ${(totalAssets - totalPasivoCapital).toFixed(2)}
+            ⚠️ Diferencia: ${(totalAssets - (totalLiabilities + isrCalculado + ptuCalculado + totalCapitalConUtilidad)).toFixed(2)}
           </p>
         )}
       </div>

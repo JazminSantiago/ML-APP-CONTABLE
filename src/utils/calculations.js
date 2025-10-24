@@ -31,27 +31,27 @@ const applyAdjustment = (adjustmentType, amount, balances) => {
     ],
     'depreciation-computo': [
       { account: 'Gastos de Depreciación', type: 'debit', amount },
-      { account: 'Depreciación Acumulada de Eq. Cómputo', type: 'credit', amount }
+      { account: 'Depreciación Acumulada de Equipo de Cómputo', type: 'credit', amount }
     ],
     'depreciation-reparto': [
       { account: 'Gastos de Depreciación', type: 'debit', amount },
-      { account: 'Depreciación Acumulada de Eq. Reparto', type: 'credit', amount }
+      { account: 'Depreciación Acumulada de Equipo de Reparto', type: 'credit', amount }
     ],
     'depreciation-transporte': [
       { account: 'Gastos de Depreciación', type: 'debit', amount },
-      { account: 'Depreciación Acumulada de Eq. Transporte', type: 'credit', amount }
+      { account: 'Depreciación Acumulada de Equipo de Transporte', type: 'credit', amount }
     ],
     'depreciation-instalacion': [
       { account: 'Gastos de Depreciación', type: 'debit', amount },
-      { account: 'Depreciación Acumulada de Gtos. Instalación', type: 'credit', amount }
+      { account: 'Depreciación Acumulada de Gastos de Instalación', type: 'credit', amount }
     ],
     'rent-expense': [
       { account: 'Gastos de Administración', type: 'debit', amount },
-      { account: 'Rentas Pagadas x Antic.', type: 'credit', amount }
+      { account: 'Rentas Pagadas por Anticipado', type: 'credit', amount }
     ],
     'stationery-expense': [
       { account: 'Gastos de Administración', type: 'debit', amount },
-      { account: 'Papelería', type: 'credit', amount }
+      { account: 'Papelería y Útiles', type: 'credit', amount }
     ]
   };
 
@@ -92,40 +92,40 @@ export function getJournalEntries(transactions, adjustments) {
     });
   });
 
-  adjustments.forEach(adj => {
+    adjustments.forEach(adj => {
     const adjustmentMap = {
-      'depreciation-edificio': [
+        'depreciation-edificio': [
         { account: 'Gastos de Depreciación', type: 'debit' },
         { account: 'Depreciación Acumulada de Edificio', type: 'credit' }
-      ],
-      'depreciation-mobiliario': [
+        ],
+        'depreciation-mobiliario': [
         { account: 'Gastos de Depreciación', type: 'debit' },
         { account: 'Depreciación Acumulada de Mobiliario', type: 'credit' }
-      ],
-      'depreciation-computo': [
+        ],
+        'depreciation-computo': [
         { account: 'Gastos de Depreciación', type: 'debit' },
-        { account: 'Depreciación Acumulada de Eq. Cómputo', type: 'credit' }
-      ],
-      'depreciation-reparto': [
+        { account: 'Depreciación Acumulada de Equipo de Cómputo', type: 'credit' }
+        ],
+        'depreciation-reparto': [
         { account: 'Gastos de Depreciación', type: 'debit' },
-        { account: 'Depreciación Acumulada de Eq. Reparto', type: 'credit' }
-      ],
-      'depreciation-transporte': [
+        { account: 'Depreciación Acumulada de Equipo de Reparto', type: 'credit' }
+        ],
+        'depreciation-transporte': [
         { account: 'Gastos de Depreciación', type: 'debit' },
-        { account: 'Depreciación Acumulada de Eq. Transporte', type: 'credit' }
-      ],
-      'depreciation-instalacion': [
+        { account: 'Depreciación Acumulada de Equipo de Transporte', type: 'credit' }
+        ],
+        'depreciation-instalacion': [
         { account: 'Gastos de Depreciación', type: 'debit' },
-        { account: 'Depreciación Acumulada de Gtos. Instalación', type: 'credit' }
-      ],
-      'rent-expense': [
+        { account: 'Depreciación Acumulada de Gastos de Instalación', type: 'credit' }
+        ],
+        'rent-expense': [
         { account: 'Gastos de Administración', type: 'debit' },
-        { account: 'Rentas Pagadas x Antic.', type: 'credit' }
-      ],
-      'stationery-expense': [
+        { account: 'Rentas Pagadas por Anticipado', type: 'credit' }
+        ],
+        'stationery-expense': [
         { account: 'Gastos de Administración', type: 'debit' },
-        { account: 'Papelería', type: 'credit' }
-      ]
+        { account: 'Papelería y Útiles', type: 'credit' }
+        ]
     };
 
     const adjustEntries = adjustmentMap[adj.adjustmentType] || [];
@@ -168,11 +168,17 @@ export function categorizeBalances(balances) {
     const type = accountTypes[account];
     
     if (type === 'asset') {
+      // Activos normales son positivos
+      assets[account] = balance;
+    } else if (type === 'contra-asset') {
+      // Depreciaciones acumuladas se restan (se mantienen como están en el balance)
       assets[account] = balance;
     } else if (type === 'liability') {
-      liabilities[account] = balance;
+      // Pasivos: invertir el signo (porque en contabilidad los créditos son positivos para pasivos)
+      liabilities[account] = Math.abs(balance);
     } else if (type === 'equity') {
-      equity[account] = balance;
+      // Capital: igual que pasivos
+      equity[account] = Math.abs(balance);
     } else if (type === 'revenue') {
       revenues[account] = balance;
     } else if (type === 'expense') {
@@ -187,7 +193,15 @@ export function categorizeBalances(balances) {
 export function calculateTotals(balances) {
   const { assets, liabilities, equity, revenues, expenses } = categorizeBalances(balances);
   
-  const totalAssets = Object.values(assets).reduce((sum, val) => sum + val, 0);
+  // Total activos (sumando positivos y restando depreciaciones)
+  const totalAssets = Object.entries(assets).reduce((sum, [account, val]) => {
+    const type = accountTypes[account];
+    if (type === 'contra-asset') {
+      return sum - Math.abs(val); // Las depreciaciones se restan
+    }
+    return sum + val;
+  }, 0);
+  
   const totalLiabilities = Object.values(liabilities).reduce((sum, val) => sum + val, 0);
   const totalEquity = Object.values(equity).reduce((sum, val) => sum + val, 0);
   const totalRevenues = Object.values(revenues).reduce((sum, val) => sum + Math.abs(val), 0);
@@ -202,7 +216,7 @@ export function calculateTotals(balances) {
   };
 }
 
-// Calcula utilidades e impuestos
+// Calcula utilidades e impuestos Y REGISTRA LOS PASIVOS
 export function calculateUtilidades(balances) {
   const { totalRevenues, totalExpenses } = calculateTotals(balances);
   

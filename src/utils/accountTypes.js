@@ -1,40 +1,48 @@
 export const accountTypes = {
+  // ACTIVOS CIRCULANTES
   'Caja': 'asset',
   'Banco': 'asset',
   'Clientes': 'asset',
   'Inventario': 'asset',
   'IVA Acreditado': 'asset',
-  'IVA por Acreditar': 'asset',
-  'Papelería': 'asset',
-  'Papeleria': 'asset',
-  'Rentas Pagadas x Antic.': 'asset',
-  'Rentas pagadas por anticipado': 'asset',
+  'Papelería y Útiles': 'asset',
+  'Rentas Pagadas por Anticipado': 'asset',
+  
+  // ACTIVOS FIJOS
   'Terreno': 'asset',
   'Edificio': 'asset',
   'Mobiliario': 'asset',
-  'Eq. de Computo': 'asset',
   'Equipo de Cómputo': 'asset',
-  'Eq. de Reparto': 'asset',
   'Equipo de Reparto': 'asset',
-  'Eq. de Transporte': 'asset',
   'Equipo de Transporte': 'asset',
-  'Gtos. de Instalacion': 'asset',
+  
+  // ACTIVOS DIFERIDOS
   'Gastos de Instalación': 'asset',
-  'Depreciación Acumulada de Edificio': 'asset',
-  'Depreciación Acumulada de Mobiliario': 'asset',
-  'Depreciación Acumulada de Eq. Cómputo': 'asset',
-  'Depreciación Acumulada de Eq. Reparto': 'asset',
-  'Depreciación Acumulada de Eq. Transporte': 'asset',
-  'Depreciación Acumulada de Gtos. Instalación': 'asset',
-  'Doctos. por pagar': 'liability',
-  'Documentos por pagar': 'liability',
+  
+  // DEPRECIACIONES ACUMULADAS (CONTRA-ACTIVOS - se restan del activo)
+  'Depreciación Acumulada de Edificio': 'contra-asset',
+  'Depreciación Acumulada de Mobiliario': 'contra-asset',
+  'Depreciación Acumulada de Equipo de Cómputo': 'contra-asset',
+  'Depreciación Acumulada de Equipo de Reparto': 'contra-asset',
+  'Depreciación Acumulada de Equipo de Transporte': 'contra-asset',
+  'Depreciación Acumulada de Gastos de Instalación': 'contra-asset',
+  
+  // PASIVOS
+  'Documentos por Pagar': 'liability',
   'IVA Trasladado': 'liability',
   'IVA por Trasladar': 'liability',
-  'Anticipo de clientes': 'liability',
-  'Capital': 'equity',
+  'Anticipo de Clientes': 'liability',
+  'ISR por Pagar': 'liability',
+  'PTU por Pagar': 'liability',
+  
+  // CAPITAL
   'Capital Social': 'equity',
   'Resultado del Ejercicio': 'equity',
+  
+  // INGRESOS
   'Ventas': 'revenue',
+  
+  // EGRESOS
   'Costo de Ventas': 'expense',
   'Gastos de Venta': 'expense',
   'Gastos de Administración': 'expense',

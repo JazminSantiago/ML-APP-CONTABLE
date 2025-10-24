@@ -151,6 +151,8 @@ function AccountingApp() {
                   endDate={endDate}
                   onStartDateChange={setStartDate}
                   onEndDateChange={setEndDate}
+                  isrCalculado={isrCalculado}
+                  ptuCalculado={ptuCalculado}
                 />
 
                 <EstadoResultados 
