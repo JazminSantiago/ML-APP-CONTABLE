@@ -18,7 +18,6 @@ export const calculateCashTotal = (cashCount) => {
   );
 };
 
-// Aplica ajustes contables según el tipo - VERSIÓN CORREGIDA
 const applyAdjustment = (adjustmentType, amount, balances) => {
   const adjustmentMap = {
     'depreciation-edificio': [
@@ -56,12 +55,23 @@ const applyAdjustment = (adjustmentType, amount, balances) => {
   };
 
   const entries = adjustmentMap[adjustmentType] || [];
-  entries.forEach(entry => {
-    if (!balances[entry.account]) balances[entry.account] = 0;
-    
-    const accountType = accountTypes[entry.account];
+
+  entries.forEach(({ account, type, amount }) => {
+    if (!balances[account]) balances[account] = 0;
+
+    const accountType = accountTypes[account];
+
+    // 🔹 Simplificada y corregida
+    if (type === 'debit') {
+      // Débito siempre aumenta activos y gastos, disminuye pasivos e ingresos
+      balances[account] += (accountType === 'liability' || accountType === 'equity' || accountType === 'revenue') ? -amount : amount;
+    } else {
+      // Crédito siempre disminuye activos y gastos, aumenta pasivos e ingresos
+      balances[account] += (accountType === 'liability' || accountType === 'equity' || accountType === 'revenue') ? amount : -amount;
+    }
   });
 };
+
 
 // Calcula saldos de todas las cuentas - VERSIÓN CORREGIDA
 export function getBalance(transactions, adjustments) {
@@ -179,12 +189,11 @@ export function categorizeBalances(balances) {
     const type = accountTypes[account];
     
     if (type === 'asset') {
-      // Activos normales: los débitos aumentan (positivos), créditos disminuyen (negativos)
-      assets[account] = balance;
+    // Los activos nunca deben mostrarse negativos: invertimos si quedó en negativo
+    assets[account] = Math.abs(balance);
     } else if (type === 'contra-asset') {
-      // Depreciaciones acumuladas: créditos aumentan (se muestran como negativos para restar)
-      // Pero en el balance se muestran como valores negativos que se restan del activo
-      assets[account] = balance;
+    // Contra-activos (depreciaciones) sí deben restar, así que los dejamos negativos
+    assets[account] = -Math.abs(balance);
     } else if (type === 'liability') {
       // Pasivos: los créditos aumentan, débitos disminuyen
       // Si el balance es negativo, el pasivo aumentó (créditos > débitos)
