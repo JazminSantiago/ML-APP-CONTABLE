@@ -14,6 +14,7 @@ import LibroDiario from './components/reports/LibroDiario';
 import MayorGeneral from './components/reports/MayorGeneral';
 import BalanceGeneral from './components/reports/BalanceGeneral';
 import EstadoResultados from './components/reports/EstadoResultados';
+import AnalisisEstadistico from './components/estadistica/AnalisisEstadistico';
 
 function AccountingApp() {
   const {
@@ -32,6 +33,10 @@ function AccountingApp() {
     updateCashCount,
     arqueoDate,
     setArqueoDate,
+    firmaEncargadoCaja,
+    setFirmaEncargadoCaja,
+    firmaEncargadoSucursal,
+    setFirmaEncargadoSucursal,
     startDate,
     setStartDate,
     endDate,
@@ -114,6 +119,10 @@ function AccountingApp() {
                 arqueoDate={arqueoDate}
                 onArqueoDateChange={setArqueoDate}
                 cashBalance={cashBalance}
+                firmaEncargadoCaja={firmaEncargadoCaja}
+                onFirmaEncargadoCajaChange={setFirmaEncargadoCaja}
+                firmaEncargadoSucursal={firmaEncargadoSucursal}
+                onFirmaEncargadoSucursalChange={setFirmaEncargadoSucursal}
               />
             )}
 
@@ -168,6 +177,10 @@ function AccountingApp() {
                   onEndDateChange={setEndDate}
                 />
               </div>
+            )}
+
+            {activeTab === 'estadistica' && (
+              <AnalisisEstadistico transactions={transactions} />
             )}
           </div>
         </div>

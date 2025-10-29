@@ -5,9 +5,11 @@ export const useTransactions = () => {
   const [transactions, setTransactions] = useLocalStorage('transactions', []);
   const [adjustments, setAdjustments] = useLocalStorage('adjustments', []);
   const [endDate, setEndDate] = useLocalStorage('endDate', new Date().toISOString().split('T')[0]);
-  const [startDate, setStartDate] = useLocalStorage('startDate', new Date().toISOString().split('T')[0]); // ← AQUÍ quedó insertada
+  const [startDate, setStartDate] = useLocalStorage('startDate', new Date().toISOString().split('T')[0]);
   const [cashCount, setCashCount] = useLocalStorage('cashCount', initialCashCount);
   const [arqueoDate, setArqueoDate] = useLocalStorage('arqueoDate', new Date().toISOString().split('T')[0]);
+  const [firmaEncargadoCaja, setFirmaEncargadoCaja] = useLocalStorage('firmaEncargadoCaja', null);
+  const [firmaEncargadoSucursal, setFirmaEncargadoSucursal] = useLocalStorage('firmaEncargadoSucursal', null);
   
   const addTransaction = (transactionData) => {
     const newTx = {
@@ -46,6 +48,8 @@ export const useTransactions = () => {
       setTransactions([]);
       setAdjustments([]);
       setCashCount(initialCashCount);
+      setFirmaEncargadoCaja(null);
+      setFirmaEncargadoSucursal(null);
       localStorage.clear();
       alert('Todos los datos han sido eliminados');
       return true;
@@ -64,6 +68,10 @@ export const useTransactions = () => {
     setCashCount,
     arqueoDate,
     setArqueoDate,
+    firmaEncargadoCaja,
+    setFirmaEncargadoCaja,
+    firmaEncargadoSucursal,
+    setFirmaEncargadoSucursal,
     addTransaction,
     deleteTransaction,
     addAdjustment,

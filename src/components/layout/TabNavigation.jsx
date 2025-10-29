@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileText, Book, Calculator, DollarSign, BarChart3, ClipboardList } from 'lucide-react';
+import { FileText, Book, Calculator, DollarSign, BarChart3, ClipboardList, TrendingUp } from 'lucide-react';
 
 export default function TabNavigation({ activeTab, onTabChange }) {
   const tabs = [
@@ -8,7 +8,8 @@ export default function TabNavigation({ activeTab, onTabChange }) {
     { id: 'arqueo', label: 'Arqueo de Caja', icon: DollarSign },
     { id: 'journal', label: 'Libro Diario', icon: Book },
     { id: 'ledger', label: 'Libro Mayor', icon: Calculator },
-    { id: 'statements', label: 'Estados Financieros', icon: BarChart3 }
+    { id: 'statements', label: 'Estados Financieros', icon: BarChart3 },
+    { id: 'estadistica', label: 'Análisis Estadístico', icon: TrendingUp }
   ];
 
   return (

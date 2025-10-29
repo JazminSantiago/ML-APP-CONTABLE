@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useRef } from 'react';
+import { Upload, X } from 'lucide-react';
 import { cashDenominations } from '../../utils/constants';
 import { calculateCashTotal } from '../../utils/calculations';
 
@@ -7,10 +8,46 @@ export default function ArqueoCaja({
   onCashCountChange, 
   arqueoDate, 
   onArqueoDateChange,
-  cashBalance 
+  cashBalance,
+  firmaEncargadoCaja,
+  onFirmaEncargadoCajaChange,
+  firmaEncargadoSucursal,
+  onFirmaEncargadoSucursalChange
 }) {
   const cashTotal = calculateCashTotal(cashCount);
   const difference = cashTotal - cashBalance;
+  
+  const inputRefCaja = useRef(null);
+  const inputRefSucursal = useRef(null);
+
+  const handleImageUpload = (e, setFirma) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Verificar que sea una imagen
+      if (!file.type.startsWith('image/')) {
+        alert('Por favor selecciona un archivo de imagen válido');
+        return;
+      }
+      
+      // Verificar tamaño (máximo 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        alert('La imagen es muy grande. Por favor selecciona una imagen menor a 2MB');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFirma(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveFirma = (setFirma) => {
+    if (window.confirm('¿Estás seguro de que quieres eliminar esta firma?')) {
+      setFirma(null);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -146,6 +183,121 @@ export default function ArqueoCaja({
               <li>✓ Estado del arqueo: {Math.abs(difference) < 0.01 ? 'Cuadrado ✅' : 'Con diferencia ⚠️'}</li>
             </ul>
           </div>
+        </div>
+      </div>
+
+      {/* SECCIÓN DE FIRMAS */}
+      <div className="bg-white border-2 border-gray-400 rounded-lg p-8">
+        <h3 className="text-xl font-bold text-gray-800 mb-8 text-center border-b-2 pb-2">
+          ✍️ FIRMAS DE CONFORMIDAD
+        </h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-4xl mx-auto">
+          {/* Firma del Encargado de Caja */}
+          <div className="text-center space-y-4">
+            <div className="h-32 border-2 border-gray-400 rounded-lg flex items-center justify-center bg-gray-50 relative overflow-hidden">
+              {firmaEncargadoCaja ? (
+                <>
+                  <img 
+                    src={firmaEncargadoCaja} 
+                    alt="Firma Encargado de Caja" 
+                    className="max-h-full max-w-full object-contain"
+                  />
+                  <button
+                    onClick={() => handleRemoveFirma(onFirmaEncargadoCajaChange)}
+                    className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
+                    title="Eliminar firma"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </>
+              ) : (
+                <div className="text-center">
+                  <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                  <p className="text-gray-400 text-sm">Click para subir firma</p>
+                </div>
+              )}
+              <input
+                ref={inputRefCaja}
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleImageUpload(e, onFirmaEncargadoCajaChange)}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              />
+            </div>
+            {!firmaEncargadoCaja && (
+              <button
+                onClick={() => inputRefCaja.current?.click()}
+                className="w-full px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 flex items-center justify-center gap-2"
+              >
+                <Upload className="w-4 h-4" /> Cargar Firma
+              </button>
+            )}
+            <div className="space-y-1 mt-4">
+              <p className="font-bold text-gray-800">_______________________________</p>
+              <p className="font-semibold text-gray-700 text-lg">Encargado de Caja</p>
+              <p className="text-sm text-gray-600">Nombre y Firma</p>
+            </div>
+          </div>
+
+          {/* Firma del Encargado de Sucursal */}
+          <div className="text-center space-y-4">
+            <div className="h-32 border-2 border-gray-400 rounded-lg flex items-center justify-center bg-gray-50 relative overflow-hidden">
+              {firmaEncargadoSucursal ? (
+                <>
+                  <img 
+                    src={firmaEncargadoSucursal} 
+                    alt="Firma Encargado de Sucursal" 
+                    className="max-h-full max-w-full object-contain"
+                  />
+                  <button
+                    onClick={() => handleRemoveFirma(onFirmaEncargadoSucursalChange)}
+                    className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
+                    title="Eliminar firma"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </>
+              ) : (
+                <div className="text-center">
+                  <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                  <p className="text-gray-400 text-sm">Click para subir firma</p>
+                </div>
+              )}
+              <input
+                ref={inputRefSucursal}
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleImageUpload(e, onFirmaEncargadoSucursalChange)}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              />
+            </div>
+            {!firmaEncargadoSucursal && (
+              <button
+                onClick={() => inputRefSucursal.current?.click()}
+                className="w-full px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 flex items-center justify-center gap-2"
+              >
+                <Upload className="w-4 h-4" /> Cargar Firma
+              </button>
+            )}
+            <div className="space-y-1 mt-4">
+              <p className="font-bold text-gray-800">_______________________________</p>
+              <p className="font-semibold text-gray-700 text-lg">Encargado de Sucursal</p>
+              <p className="text-sm text-gray-600">Nombre y Firma</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Nota adicional */}
+        <div className="mt-8 p-4 bg-gray-50 rounded border text-center">
+          <p className="text-xs text-gray-600">
+            📌 <strong>Nota:</strong> Este documento certifica que el conteo físico de efectivo fue realizado 
+            en presencia de ambas partes y que los montos registrados son correctos. 
+            Las firmas validan la conformidad con los resultados del arqueo.
+          </p>
+          <p className="text-xs text-gray-500 mt-2">
+            💡 <strong>Tip:</strong> Puedes cargar una imagen de tu firma escaneada o usar una foto de tu firma manuscrita.
+          </p>
         </div>
       </div>
     </div>
