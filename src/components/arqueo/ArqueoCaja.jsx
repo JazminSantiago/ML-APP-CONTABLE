@@ -1,7 +1,42 @@
+// src/components/arqueo/ArqueoCaja.jsx
 import React, { useRef } from 'react';
 import { Upload, X } from 'lucide-react';
-import { cashDenominations } from '../../utils/constants';
-import { calculateCashTotal } from '../../utils/calculations';
+
+const cashDenominations = {
+  bills: [
+    { key: 'bill1000', label: '$1000', value: 1000 },
+    { key: 'bill500', label: '$500', value: 500 },
+    { key: 'bill200', label: '$200', value: 200 },
+    { key: 'bill100', label: '$100', value: 100 },
+    { key: 'bill50', label: '$50', value: 50 },
+    { key: 'bill20', label: '$20', value: 20 }
+  ],
+  coins: [
+    { key: 'coin20', label: '$20', value: 20 },
+    { key: 'coin10', label: '$10', value: 10 },
+    { key: 'coin5', label: '$5', value: 5 },
+    { key: 'coin2', label: '$2', value: 2 },
+    { key: 'coin1', label: '$1', value: 1 },
+    { key: 'coin50', label: '$0.50', value: 0.5 }
+  ]
+};
+
+const calculateCashTotal = (cashCount) => {
+  return (
+    cashCount.bill1000 * 1000 +
+    cashCount.bill500 * 500 +
+    cashCount.bill200 * 200 +
+    cashCount.bill100 * 100 +
+    cashCount.bill50 * 50 +
+    cashCount.bill20 * 20 +
+    cashCount.coin20 * 20 +
+    cashCount.coin10 * 10 +
+    cashCount.coin5 * 5 +
+    cashCount.coin2 * 2 +
+    cashCount.coin1 * 1 +
+    cashCount.coin50 * 0.5
+  );
+};
 
 export default function ArqueoCaja({ 
   cashCount, 
@@ -12,7 +47,11 @@ export default function ArqueoCaja({
   firmaEncargadoCaja,
   onFirmaEncargadoCajaChange,
   firmaEncargadoSucursal,
-  onFirmaEncargadoSucursalChange
+  onFirmaEncargadoSucursalChange,
+  nombreEncargadoCaja,
+  onNombreEncargadoCajaChange,
+  nombreEncargadoSucursal,
+  onNombreEncargadoSucursalChange
 }) {
   const cashTotal = calculateCashTotal(cashCount);
   const difference = cashTotal - cashBalance;
@@ -20,16 +59,22 @@ export default function ArqueoCaja({
   const inputRefCaja = useRef(null);
   const inputRefSucursal = useRef(null);
 
+  // Debug: verificar qué funciones llegan
+  console.log('Props recibidos:', {
+    nombreEncargadoCaja,
+    onNombreEncargadoCajaChange: typeof onNombreEncargadoCajaChange,
+    nombreEncargadoSucursal,
+    onNombreEncargadoSucursalChange: typeof onNombreEncargadoSucursalChange
+  });
+
   const handleImageUpload = (e, setFirma) => {
     const file = e.target.files[0];
     if (file) {
-      // Verificar que sea una imagen
       if (!file.type.startsWith('image/')) {
         alert('Por favor selecciona un archivo de imagen válido');
         return;
       }
       
-      // Verificar tamaño (máximo 2MB)
       if (file.size > 2 * 1024 * 1024) {
         alert('La imagen es muy grande. Por favor selecciona una imagen menor a 2MB');
         return;
@@ -204,26 +249,31 @@ export default function ArqueoCaja({
                     className="max-h-full max-w-full object-contain"
                   />
                   <button
-                    onClick={() => handleRemoveFirma(onFirmaEncargadoCajaChange)}
-                    className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveFirma(onFirmaEncargadoCajaChange);
+                    }}
+                    className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 z-10"
                     title="Eliminar firma"
                   >
                     <X className="w-4 h-4" />
                   </button>
                 </>
               ) : (
-                <div className="text-center">
-                  <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                  <p className="text-gray-400 text-sm">Click para subir firma</p>
-                </div>
+                <>
+                  <div className="text-center pointer-events-none">
+                    <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                    <p className="text-gray-400 text-sm">Click para subir firma</p>
+                  </div>
+                  <input
+                    ref={inputRefCaja}
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleImageUpload(e, onFirmaEncargadoCajaChange)}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                </>
               )}
-              <input
-                ref={inputRefCaja}
-                type="file"
-                accept="image/*"
-                onChange={(e) => handleImageUpload(e, onFirmaEncargadoCajaChange)}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              />
             </div>
             {!firmaEncargadoCaja && (
               <button
@@ -233,10 +283,20 @@ export default function ArqueoCaja({
                 <Upload className="w-4 h-4" /> Cargar Firma
               </button>
             )}
-            <div className="space-y-1 mt-4">
+            <div className="space-y-2 mt-4">
               <p className="font-bold text-gray-800">_______________________________</p>
-              <p className="font-semibold text-gray-700 text-lg">Encargado de Caja</p>
-              <p className="text-sm text-gray-600">Nombre y Firma</p>
+              <input
+                type="text"
+                placeholder="Nombre del Encargado de Caja"
+                value={nombreEncargadoCaja || ''}
+                onChange={(e) => {
+                  if (onNombreEncargadoCajaChange && typeof onNombreEncargadoCajaChange === 'function') {
+                    onNombreEncargadoCajaChange(e.target.value);
+                  }
+                }}
+                className="w-full p-2 border-2 border-gray-300 rounded text-center font-semibold text-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              />
+              <p className="text-sm text-gray-600">Encargado de Caja</p>
             </div>
           </div>
 
@@ -251,26 +311,31 @@ export default function ArqueoCaja({
                     className="max-h-full max-w-full object-contain"
                   />
                   <button
-                    onClick={() => handleRemoveFirma(onFirmaEncargadoSucursalChange)}
-                    className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveFirma(onFirmaEncargadoSucursalChange);
+                    }}
+                    className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 z-10"
                     title="Eliminar firma"
                   >
                     <X className="w-4 h-4" />
                   </button>
                 </>
               ) : (
-                <div className="text-center">
-                  <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                  <p className="text-gray-400 text-sm">Click para subir firma</p>
-                </div>
+                <>
+                  <div className="text-center pointer-events-none">
+                    <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                    <p className="text-gray-400 text-sm">Click para subir firma</p>
+                  </div>
+                  <input
+                    ref={inputRefSucursal}
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleImageUpload(e, onFirmaEncargadoSucursalChange)}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                </>
               )}
-              <input
-                ref={inputRefSucursal}
-                type="file"
-                accept="image/*"
-                onChange={(e) => handleImageUpload(e, onFirmaEncargadoSucursalChange)}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              />
             </div>
             {!firmaEncargadoSucursal && (
               <button
@@ -280,10 +345,16 @@ export default function ArqueoCaja({
                 <Upload className="w-4 h-4" /> Cargar Firma
               </button>
             )}
-            <div className="space-y-1 mt-4">
+            <div className="space-y-2 mt-4">
               <p className="font-bold text-gray-800">_______________________________</p>
-              <p className="font-semibold text-gray-700 text-lg">Encargado de Sucursal</p>
-              <p className="text-sm text-gray-600">Nombre y Firma</p>
+              <input
+                type="text"
+                placeholder="Nombre del Encargado de Sucursal"
+                value={nombreEncargadoSucursal}
+                onChange={(e) => onNombreEncargadoSucursalChange(e.target.value)}
+                className="w-full p-2 border-2 border-gray-300 rounded text-center font-semibold text-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              />
+              <p className="text-sm text-gray-600">Encargado de Sucursal</p>
             </div>
           </div>
         </div>
