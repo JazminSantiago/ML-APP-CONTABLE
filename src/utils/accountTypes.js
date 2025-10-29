@@ -48,6 +48,7 @@ export const accountTypes = {
   'Costo de Ventas': 'expense',
   'Gastos de Venta': 'expense',
   'Gastos de Administración': 'expense',
+  'Gastos Generales': 'expense',
   'Gastos de Depreciación': 'expense',
   'ISR 30%': 'expense',
   'PTU 10%': 'expense'
