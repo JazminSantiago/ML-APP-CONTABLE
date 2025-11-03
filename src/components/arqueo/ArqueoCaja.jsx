@@ -1,6 +1,6 @@
 // src/components/arqueo/ArqueoCaja.jsx
 import React, { useRef } from 'react';
-import { Upload, X } from 'lucide-react';
+import { Upload, X, Download } from 'lucide-react';
 
 const cashDenominations = {
   bills: [
@@ -59,14 +59,6 @@ export default function ArqueoCaja({
   const inputRefCaja = useRef(null);
   const inputRefSucursal = useRef(null);
 
-  // Debug: verificar qué funciones llegan
-  console.log('Props recibidos:', {
-    nombreEncargadoCaja,
-    onNombreEncargadoCajaChange: typeof onNombreEncargadoCajaChange,
-    nombreEncargadoSucursal,
-    onNombreEncargadoSucursalChange: typeof onNombreEncargadoSucursalChange
-  });
-
   const handleImageUpload = (e, setFirma) => {
     const file = e.target.files[0];
     if (file) {
@@ -94,8 +86,197 @@ export default function ArqueoCaja({
     }
   };
 
+  const generarPDF = () => {
+  const contenido = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <style>
+        @page {
+          size: letter;
+          margin: 0.5cm;
+        }
+        
+        body { 
+          font-family: Arial, sans-serif; 
+          margin: 0;
+          padding: 10px;
+          font-size: 11px;
+        }
+        
+        @media print {
+          body {
+            width: 100%;
+            height: 100vh;
+          }
+          .no-break {
+            page-break-inside: avoid;
+          }
+        }
+          .header { 
+          background: #4F46E5; 
+          color: white; 
+          padding: 12px; 
+          text-align: center; 
+          margin-bottom: 10px;
+        }
+        
+        .header h1 {
+          margin: 0;
+          font-size: 18px;
+        }
+        
+        .header h2 {
+          margin: 5px 0;
+          font-size: 14px;
+        }
+        
+        .header p {
+          margin: 0;
+          font-size: 10px;
+        }
+          .section { 
+          margin: 8px 0; 
+          padding: 8px; 
+          border: 1px solid #ddd; 
+          page-break-inside: avoid;
+        }
+        
+        .section h3 {
+          font-size: 13px;
+          margin: 0 0 8px 0;
+        }
+        
+        .section h4 {
+          font-size: 11px;
+          margin: 8px 0 5px 0;
+        }
+          .denominacion { 
+          display: flex; 
+          justify-content: space-between; 
+          padding: 2px 0; 
+          font-size: 10px;
+        }
+        
+        .resultado { 
+          background: #F3F4F6; 
+          padding: 6px; 
+          margin: 5px 0; 
+          font-size: 10px;
+        }
+        
+        .firma-box { 
+          display: inline-block; 
+          width: 45%; 
+          text-align: center; 
+          margin: 5px; 
+          vertical-align: top;
+        }
+        
+        .firma-img { 
+          max-width: 150px; 
+          max-height: 50px; 
+          border: 1px solid #ddd; 
+        }
+        
+        .firma-box p {
+          margin: 3px 0;
+          font-size: 9px;
+        }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>Bite Club S.A.</h1>
+          <h2>ARQUEO DE CAJA</h2>
+          <p>Fecha: ${new Date(arqueoDate).toLocaleDateString('es-MX')}</p>
+        </div>
+
+        <div class="section">
+          <h3>💵 CONTEO FÍSICO DE EFECTIVO</h3>
+          <h4>Billetes:</h4>
+          ${cashDenominations.bills.map(bill => `
+            <div class="denominacion">
+              <span>${bill.label}</span>
+              <span>x ${cashCount[bill.key]}</span>
+              <span>= $${(cashCount[bill.key] * bill.value).toFixed(2)}</span>
+            </div>
+          `).join('')}
+          
+          <h4>Monedas:</h4>
+          ${cashDenominations.coins.map(coin => `
+            <div class="denominacion">
+              <span>${coin.label}</span>
+              <span>x ${cashCount[coin.key]}</span>
+              <span>= $${(cashCount[coin.key] * coin.value).toFixed(2)}</span>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="section">
+          <h3>📊 RESULTADOS DEL ARQUEO</h3>
+          <div class="resultado">
+            <strong>Saldo Según Libros:</strong> $${cashBalance.toFixed(2)}
+          </div>
+          <div class="resultado">
+            <strong>Efectivo Contado:</strong> $${cashTotal.toFixed(2)}
+          </div>
+          <div class="resultado" style="background: ${Math.abs(difference) < 0.01 ? '#D1FAE5' : cashTotal > cashBalance ? '#DBEAFE' : '#FEE2E2'}">
+            <strong>Diferencia:</strong> $${difference.toFixed(2)}
+          </div>
+          <p><strong>Interpretación:</strong> ${
+            Math.abs(difference) < 0.01 ? 'El arqueo cuadra perfectamente.' :
+            cashTotal > cashBalance ? 'Sobrante de caja.' : 'Faltante de caja.'
+          }</p>
+        </div>
+
+        <div class="section">
+          <h3>✍️ FIRMAS DE CONFORMIDAD</h3>
+          <div style="text-align: center;">
+            <div class="firma-box">
+              ${firmaEncargadoCaja ? `<img src="${firmaEncargadoCaja}" class="firma-img" />` : '<div style="height: 80px; border: 1px solid #ddd;"></div>'}
+              <p>_______________________</p>
+              <p><strong>${nombreEncargadoCaja || '____________________'}</strong></p>
+              <p>Encargado de Caja</p>
+            </div>
+            <div class="firma-box">
+              ${firmaEncargadoSucursal ? `<img src="${firmaEncargadoSucursal}" class="firma-img" />` : '<div style="height: 80px; border: 1px solid #ddd;"></div>'}
+              <p>_______________________</p>
+              <p><strong>${nombreEncargadoSucursal || '____________________'}</strong></p>
+              <p>Encargado de Sucursal</p>
+            </div>
+          </div>
+        </div>
+
+        <p style="text-align: center; color: #666; font-size: 12px;">
+          Generado el ${new Date().toLocaleDateString('es-MX')} a las ${new Date().toLocaleTimeString('es-MX')}
+        </p>
+      </body>
+      </html>
+    `;
+
+    const ventana = window.open('', '_blank');
+    ventana.document.write(contenido);
+    ventana.document.close();
+    setTimeout(() => {
+      ventana.print();
+    }, 250);
+  };
+
   return (
     <div className="space-y-6">
+      {/* Botón para generar PDF */}
+      <div className="flex justify-end">
+        <button
+          onClick={generarPDF}
+          className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-semibold shadow-lg transition"
+        >
+          <Download className="w-5 h-5" />
+          Generar PDF del Arqueo
+        </button>
+      </div>
+
       <div className="text-center mb-8 border-b-2 border-yellow-600 pb-4">
         <h2 className="text-xl font-bold text-gray-800">Bite Club S.A.</h2>
         <p className="text-lg font-semibold text-yellow-600 mt-2">ARQUEO DE CAJA</p>
@@ -289,11 +470,7 @@ export default function ArqueoCaja({
                 type="text"
                 placeholder="Nombre del Encargado de Caja"
                 value={nombreEncargadoCaja || ''}
-                onChange={(e) => {
-                  if (onNombreEncargadoCajaChange && typeof onNombreEncargadoCajaChange === 'function') {
-                    onNombreEncargadoCajaChange(e.target.value);
-                  }
-                }}
+                onChange={(e) => onNombreEncargadoCajaChange(e.target.value)}
                 className="w-full p-2 border-2 border-gray-300 rounded text-center font-semibold text-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               />
               <p className="text-sm text-gray-600">Encargado de Caja</p>
@@ -350,7 +527,7 @@ export default function ArqueoCaja({
               <input
                 type="text"
                 placeholder="Nombre del Encargado de Sucursal"
-                value={nombreEncargadoSucursal}
+                value={nombreEncargadoSucursal || ''}
                 onChange={(e) => onNombreEncargadoSucursalChange(e.target.value)}
                 className="w-full p-2 border-2 border-gray-300 rounded text-center font-semibold text-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               />

@@ -10,6 +10,8 @@ export const useTransactions = () => {
   const [arqueoDate, setArqueoDate] = useLocalStorage('arqueoDate', new Date().toISOString().split('T')[0]);
   const [firmaEncargadoCaja, setFirmaEncargadoCaja] = useLocalStorage('firmaEncargadoCaja', null);
   const [firmaEncargadoSucursal, setFirmaEncargadoSucursal] = useLocalStorage('firmaEncargadoSucursal', null);
+  const [nombreEncargadoCaja, setNombreEncargadoCaja] = useLocalStorage('nombreEncargadoCaja', '');
+  const [nombreEncargadoSucursal, setNombreEncargadoSucursal] = useLocalStorage('nombreEncargadoSucursal', '');
   
   const addTransaction = (transactionData) => {
     const newTx = {
@@ -72,6 +74,10 @@ export const useTransactions = () => {
     setFirmaEncargadoCaja,
     firmaEncargadoSucursal,
     setFirmaEncargadoSucursal,
+    nombreEncargadoCaja,        // ← AGREGAR ESTA LÍNEA
+    setNombreEncargadoCaja,     // ← AGREGAR ESTA LÍNEA
+    nombreEncargadoSucursal,    // ← AGREGAR ESTA LÍNEA
+    setNombreEncargadoSucursal, // ← AGREGAR ESTA LÍNEA
     addTransaction,
     deleteTransaction,
     addAdjustment,

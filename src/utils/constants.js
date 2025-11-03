@@ -28,7 +28,7 @@ export const cashDenominations = {
     { key: 'coin5', label: '$5', value: 5 },
     { key: 'coin2', label: '$2', value: 2 },
     { key: 'coin1', label: '$1', value: 1 },
-    { key: 'coin50', label: '$0.50', value: 0.5 }  // Cambiado a coin50
+    { key: 'coin50', label: '$0.50', value: 0.5 }
   ]
 };
 

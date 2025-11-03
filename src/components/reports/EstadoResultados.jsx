@@ -7,9 +7,9 @@ export default function EstadoResultados({
   isrCalculado,
   ptuCalculado,
   utilidadNeta,
-  startDate, // Nuevo prop para fecha inicial
+  startDate,
   endDate,
-  onStartDateChange, // Nuevo prop para manejar cambio de fecha inicial
+  onStartDateChange,
   onEndDateChange
 }) {
   const costoVentas = Math.abs(balances['Costo de Ventas'] || 0);

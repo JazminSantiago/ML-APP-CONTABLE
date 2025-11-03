@@ -37,6 +37,10 @@ function AccountingApp() {
     setFirmaEncargadoCaja,
     firmaEncargadoSucursal,
     setFirmaEncargadoSucursal,
+    nombreEncargadoCaja,
+    setNombreEncargadoCaja,
+    nombreEncargadoSucursal,
+    setNombreEncargadoSucursal,
     startDate,
     setStartDate,
     endDate,
@@ -123,6 +127,10 @@ function AccountingApp() {
                 onFirmaEncargadoCajaChange={setFirmaEncargadoCaja}
                 firmaEncargadoSucursal={firmaEncargadoSucursal}
                 onFirmaEncargadoSucursalChange={setFirmaEncargadoSucursal}
+                nombreEncargadoCaja={nombreEncargadoCaja}
+                onNombreEncargadoCajaChange={setNombreEncargadoCaja}
+                nombreEncargadoSucursal={nombreEncargadoSucursal}
+                onNombreEncargadoSucursalChange={setNombreEncargadoSucursal}
               />
             )}
 
