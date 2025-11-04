@@ -1,4 +1,3 @@
-import { useLocalStorage } from './useLocalStorage';
 import { initialCashCount } from '../utils/constants';
 
 export const useTransactions = () => {
