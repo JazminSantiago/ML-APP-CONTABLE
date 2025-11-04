@@ -1,42 +1,69 @@
-import { useState } from 'react';
-import { useLocalStorage } from './useLocalStorage';
-
-const defaultUsers = [
-  { username: 'admin', password: 'admin123' },
-  { username: 'contador', password: 'cont123' }
-];
+// src/hooks/useAuth.js
+import { useState, useEffect } from 'react';
+import { authService } from '../services/api';
 
 export const useAuth = () => {
-  const [users, setUsers] = useLocalStorage('users', defaultUsers);
-  const [currentUser, setCurrentUser] = useLocalStorage('currentUser', null);
-  const [isLoggedIn, setIsLoggedIn] = useState(!!currentUser);
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const login = (username, password) => {
-    const user = users.find(u => u.username === username && u.password === password);
-    if (user) {
-      setCurrentUser(username);
+  useEffect(() => {
+    // Cargar usuario al inicio
+    const currentUser = authService.getCurrentUser();
+    const currentToken = authService.getToken();
+    
+    if (currentUser && currentToken) {
+      setUser(currentUser);
+      setToken(currentToken);
       setIsLoggedIn(true);
-      return { success: true };
     }
-    return { success: false, message: 'Usuario o contraseña incorrectos' };
+  }, []);
+
+  const login = async (username, password) => {
+    try {
+      const data = await authService.login(username, password);
+      
+      if (data.token) {
+        setUser(data.user);
+        setToken(data.token);
+        setIsLoggedIn(true);
+        return { success: true };
+      }
+      
+      return { success: false, message: data.message || 'Error al iniciar sesión' };
+    } catch (error) {
+      console.error('Error en login:', error);
+      return { success: false, message: 'Error de conexión con el servidor' };
+    }
   };
 
   const logout = () => {
-    setCurrentUser(null);
+    authService.logout();
+    setUser(null);
+    setToken(null);
     setIsLoggedIn(false);
   };
 
-  const register = (username, password) => {
-    if (users.find(u => u.username === username)) {
-      return { success: false, message: 'El usuario ya existe' };
+  const register = async (username, password) => {
+    try {
+      const data = await authService.register(username, password);
+      
+      if (data.message === 'Usuario registrado exitosamente') {
+        return { success: true, message: data.message };
+      }
+      
+      return { success: false, message: data.message || 'Error al registrar' };
+    } catch (error) {
+      console.error('Error en registro:', error);
+      return { success: false, message: 'Error de conexión con el servidor' };
     }
-    setUsers([...users, { username, password }]);
-    return { success: true, message: 'Usuario registrado exitosamente' };
   };
 
   return {
     isLoggedIn,
-    currentUser,
+    currentUser: user?.username,
+    user,
+    token,
     login,
     logout,
     register
